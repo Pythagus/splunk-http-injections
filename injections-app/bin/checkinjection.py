@@ -2,6 +2,7 @@
 
 import sys
 from splunklib.searchcommands import dispatch, StreamingCommand, Configuration, Option, validators
+from injection import patterns
 from injection import http
 
 @Configuration()
@@ -48,10 +49,8 @@ class CheckInjectionCommand(StreamingCommand):
     # command executes. It is used to get the configuration
     # data from Splunk.
     def prepare(self):
-        http.set_config("wordpress", True) # TODO to be removed
-
         # Build the regexes and local stuff.
-        http.build()
+        patterns.build()
 
     # This is the method treating all the events.
     def stream(self, events):

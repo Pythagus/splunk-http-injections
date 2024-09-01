@@ -7,14 +7,6 @@ try:
 except ImportError:
     from urllib import unquote
 
-# TODO to be improved
-import re
-worthless_asset_url_regex = re.compile(r"^([a-zA-Z0-9\/\-\._]+)$")
-
-
-def build():
-    patterns.build()
-
 
 def is_suspicious_url(url: str):
     cleaned = clean_url(url)
@@ -90,4 +82,4 @@ def is_worthless_url(input: str):
     return input in ["", "/"] or len(input) <= 5
 
 def is_legitimate_asset_url(input: str):
-    return input.endswith(('.ttf', '.png', '.jpg', '.jpeg', '.ico', '.css', '.gif')) and worthless_asset_url_regex.search(input) is not None
+    return input.endswith(('.ttf', '.png', '.jpg', '.jpeg', '.ico', '.css', '.gif')) and patterns.worthless_asset.search(input) is not None
