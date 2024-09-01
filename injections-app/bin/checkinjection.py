@@ -32,6 +32,8 @@ class CheckInjectionCommand(StreamingCommand):
             **Description:** HTTP Accept-Language parameter given by the client ''',
         require=False)
     
+    # Determine whether the command has defined
+    # the given parameter.
     def hasParameter(self, param: str):
         return getattr(self, param) is not None
     

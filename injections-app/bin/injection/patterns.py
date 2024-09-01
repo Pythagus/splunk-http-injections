@@ -7,6 +7,13 @@ import re
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 LOOKUP_PATH = CURRENT_DIR + "/../../lookups/Injections_Rules.csv"
 
+# Common regex-es instances. It is initialized in the build function.
+url = None
+useragent = None
+language = None
+xff = None
+worthless_asset = None
+
 
 # This exception is raised when the library tried to
 # access the lookup Injections_Rules.csv but this was
@@ -14,18 +21,24 @@ LOOKUP_PATH = CURRENT_DIR + "/../../lookups/Injections_Rules.csv"
 class MissingInjectionLookupException(Exception): pass
 
 
+# This class will help to manage a list of regex-es to
+# match to the given strings.
 class RegexMatcher(object):
 
+    # Build the regex matcher instance.
     def __init__(self, patterns: dict = None):
         self.regex = {}
 
         if patterns:
             self.append(patterns)
 
+    # Append new regex-es to the current ones.
     def append(self, patterns: dict):
         for key in patterns:
             self.regex[key] = re.compile(patterns[key])
 
+    # This method will return the id of the first rule that
+    # matched the given input or False if no rule triggered.
     def match(self, input: str):
         for key in self.regex:
             if self.regex[key].search(input) is not None:
@@ -33,19 +46,20 @@ class RegexMatcher(object):
             
         return False
 
-# URL patterns.
-url = None
 
-# Other HTTP parameters.
-useragent = None
-language = None
-xff = None
-worthless_asset = None
-
+# Build the regexes.
+# This is not done when the file is loaded to let Splunk
+# decide when is the appropriate time (when the command 
+# calls the prepare() method).
 def build():
+    # If the compiled regex needs to be updated,
+    # then update the Python code.
     if _needsRebuildPython():
         _buildPythonFile()
 
+    # We can only import the rules now that we are sure the
+    # file exists. Before that, if it was the first initialization,
+    # the file wouldn't exist.
     from . import compiled_rules
 
     global url
@@ -72,19 +86,33 @@ def build():
     worthless_asset = re.compile(compiled_rules.pattern_worthless_asset_url)
 
 
+# Determine whether the compiled Python code needs
+# to be genreated again.
 def _needsRebuildPython():
     try:
+        # Try to get the last lookup update time.
         last_update_time = int(os.path.getmtime(LOOKUP_PATH))
     except FileNotFoundError:
+        # If this happens, it's because the lookup doesn't
+        # exist yet. The user probably forgot to initialize
+        # the application properly.
         raise MissingInjectionLookupException(LOOKUP_PATH)
     
     try:
         from . import compiled_rules
 
+        # Determine whether the last compilation date is older than
+        # the lookup update time.
         return compiled_rules.generation_time < last_update_time
     except (ModuleNotFoundError, ImportError):
+        # If the import failed, then the compiled file doesn't exist. So
+        # we need to build it!
         return True
     
+
+# This function will build a Python script containing the
+# regex patterns. This is useful to avoid accessing the lookup
+# file at every call of the script.
 def _buildPythonFile():
     with open(LOOKUP_PATH, 'r') as fd:
         reader = csv.reader(fd, delimiter=",")
@@ -108,7 +136,7 @@ def _buildPythonFile():
                 if type not in rules:
                     rules[type] = {}
 
-                rules[type][id] = line[k_rule]
+                rules[type][id] = rule
 
     with open(CURRENT_DIR + '/compiled_rules.py', 'w') as fd:
         generation_time = int(time.time())
