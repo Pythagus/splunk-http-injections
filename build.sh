@@ -16,4 +16,11 @@ if [ -f $OUTPUT_FILE ] ; then
 fi
 
 # Generate the new export.
-COPYFILE_DISABLE=1 tar --exclude-vcs --exclude="__pycache__" --exclude="log" --format ustar -cvzf injections.tar.gz injections-app
+COPYFILE_DISABLE=1 tar \
+    --exclude-vcs \
+    --exclude="__pycache__" \
+    --exclude="log" \
+    --exclude="injections-app/bin/injection/compiled_rules.py" \
+    --format ustar \
+    -cvzf \
+    injections.tar.gz injections-app

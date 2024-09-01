@@ -1,5 +1,6 @@
 # Python files.
 __pycache__
+injections-app/bin/injection/compiled_rules.py
 
 # Splunk unwanted files.
 injections-app/lookups
