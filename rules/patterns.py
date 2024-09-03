@@ -1,4 +1,17 @@
 #
+# This file contains all the rules useful to 
+# recognize the suspicious URL among the legitimate
+# HTTP traffic.
+#
+# Author: Damien MOLINA
+#
+
+# This value is extremely useful to determine the date of the
+# last update of the rules, so that we can only take the new rules
+# into account if the client checked the new rules.
+version = 1
+
+#
 # Local File Inclusion (LFI).
 #
 # As OWASP says, "Local file inclusion (also known as LFI) is the process of including files, 
@@ -13,7 +26,7 @@
 #
 # See: https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/11.1-Testing_for_Local_File_Inclusion
 #
-pattern_lfi = {
+patterns_lfi = {
     # Directory traversal (Windows + Linux).
     "LFI_1": r"(\/|\\)+(\.)+(\/|\\)+(\.)+",
 
@@ -41,7 +54,7 @@ pattern_lfi = {
 #
 # See: https://owasp.org/www-community/attacks/SQL_Injection
 #
-pattern_sqli = {
+patterns_sqli = {
     "SQL_1": r"(\W|)(or|and|having|where)(\s+)((\(|\"|\')*)([0-9xy]+)((\)|\"|\')*)=((\(|\"|\')*)([0-9xy]+)", # AND/OR 1=1
     "SQL_2": r"(\W|)(select|insert|update|delete|drop|alter|create|union|waitfor(\s+)delay|(order(\s+)by))\s+", # SQL keywords
     "SQL_3": r"(\W|)(pg_sleep|benchmark|randomblob|sleep|concat|concat_ws|extractvalue|updatexml|tdesencrypt|md5|chr)(\s*)\(", # SQL functions
@@ -63,7 +76,7 @@ pattern_sqli = {
 #      - http://example.org/?query=<script>top["al" + "ert"](document["cookie"])</   script >
 #
 # See: https://owasp.org/www-community/attacks/xss/
-pattern_xss = {
+patterns_xss = {
     "XSS_1": r"<(\s*)script(\s*)", # <script> tags
     "XSS_2": r"(\W|)on([a-z]+)(\s|=| |})", # Javascript keywords
     "XSS_3": r"(\W|)(throw|alert|prompt)(\s*)(\s|{|\(|\)|\`)", # Some Javascript functions like alert(3)
@@ -86,7 +99,7 @@ pattern_xss = {
 # See: 
 #      - https://owasp.org/www-community/attacks/Code_Injection
 #      - https://owasp.org/www-community/attacks/Command_Injection
-pattern_rce = {
+patterns_rce = {
     # HTTP redirections.
     "RCE_HTTP_1": r"\b(oast\.pro|oast\.live|oast\.site|oast\.online|oast\.fun|oast\.me|bxss\.me|interact\.sh|evil\.com|cirt\.net)", # Redirection to known malicious websites.
     
