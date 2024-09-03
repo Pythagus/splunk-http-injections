@@ -37,7 +37,7 @@ patterns_lfi = {
     "LFI_5": r"\.(pem|py|key|yml|sh|ppk|p12|conf|sqlite|sqlitedb|sql|db|sql\.\w+|tar|tar\.\w+|war|rar|7z|bz2|lz|swp)$", # Suspicious files that shouldn't be accessed via URL.
 
     # Other files.
-    "LFI_6": r"(\W|)(c|d):(\/|\\)", # Windows system files.
+    "LFI_6": r"(\W|)(c|d):((\/|\\)|windows)", # Windows system files.
     "LFI_7": r"\/(readme|changes|changelog|code_of_conduct|versioning|license|contributing)\.md", # Git files.
     "LFI_8": r"^(?:\/)?vendor(\/|\\)", # PHP librairy files.
 }
@@ -55,10 +55,10 @@ patterns_lfi = {
 # See: https://owasp.org/www-community/attacks/SQL_Injection
 #
 patterns_sqli = {
-    "SQL_1": r"(\W|)(or|and|having|where)(\s+)((\(|\"|\')*)([0-9xy]+)((\)|\"|\')*)=((\(|\"|\')*)([0-9xy]+)", # AND/OR 1=1
+    "SQL_1": r"(\W|)(or|and|having|where)(\s|:|\(|\"|\')*[0-9xya]+(\)|\"|\'|\s)*=+(\s|\(|\"|\')*[0-9axy]+", # AND/OR 1=1
     "SQL_2": r"(\W|)(select|insert|update|delete|drop|alter|create|union|waitfor(\s+)delay|(order(\s+)by))\s+", # SQL keywords
     "SQL_3": r"(\W|)(pg_sleep|benchmark|randomblob|sleep|concat|concat_ws|extractvalue|updatexml|tdesencrypt|md5|chr)(\s*)\(", # SQL functions
-    "SQL_4": r"(\W|)(or|and)(\s+)true", # Arithmetic evaluation
+    "SQL_4": r"(\W|)(or|and)((\s+)true|(.*)is(\s*)null)", # Arithmetic evaluation
     "SQL_5": r"(\W|)(xp_cmdshell|xp_regread)", # Microsoft SQL server commands
     "SQL_6": r"(\W|)(bin|ord|hex|char)[^a-z0-9\/]", # SQL 'arithmetic' functions
 }

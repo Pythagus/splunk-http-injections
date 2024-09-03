@@ -22,10 +22,10 @@ RCE###RCE_PHP_4###(bzip2|expect|glob|phar|ogg|rar|ssh2|zip|zlib|file|php):\/\/
 RCE###RCE_JAVA_1###\bjava\.(io|lang)\.
 RCE###RCE_OS_1###(\W|)(echo|nslookup|printenv|which|wget|curl|whoami|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)\b
 RCE###RCE_WINDOWS_1###(%systemroot%|hklm\\system\\)
-SQLI###SQL_1###(\W|)(or|and|having|where)(\s+)((\(|\"|\')*)([0-9xy]+)((\)|\"|\')*)=((\(|\"|\')*)([0-9xy]+)
+SQLI###SQL_1###(\W|)(or|and|having|where)(\s*)((:|\(|\"|\')*)([0-9xya]+)((\)|\"|\')*)(\s*)=+(\s*)((\(|\"|\')*)([0-9axy]+)
 SQLI###SQL_2###(\W|)(select|insert|update|delete|drop|alter|create|union|waitfor(\s+)delay|(order(\s+)by))\s+
 SQLI###SQL_3###(\W|)(pg_sleep|benchmark|randomblob|sleep|concat|concat_ws|extractvalue|updatexml|tdesencrypt|md5|chr)(\s*)\(
-SQLI###SQL_4###(\W|)(or|and)(\s+)true
+SQLI###SQL_4###(\W|)(or|and)((\s+)true|(.*)is(\s*)null)
 SQLI###SQL_5###(\W|)(xp_cmdshell|xp_regread)
 SQLI###SQL_6###(\W|)(bin|ord|hex|char)[^a-z0-9\/]
 HTTP###USER_AGENT###(API-Spyder|Cyberint|HTTP Banner Detection|Nacos|bitdiscovery|Nmap)
