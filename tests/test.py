@@ -104,3 +104,4 @@ test_from_file("XSS", "xss.txt", match=lambda x: http.is_suspicious_url(x), must
 test_from_file("LFI", "lfi.txt", match=lambda x: http.is_suspicious_url(x), must_match=True)
 test_from_file("SQLI", "sqli.txt", match=lambda x: http.is_suspicious_url(x), must_match=True)
 test_from_file("XFF", "xff.csv", match=lambda x: http.is_suspicious_xff(x))
+test_from_file("ACCEPT_LANGUAGE", "accept_language.csv", match=lambda x: http.is_suspicious_accept_language(x))
