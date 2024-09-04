@@ -24,6 +24,33 @@ from injection import http
 print_failures = False
 
 
+# Compile the rules in a json-like format. This is
+# used to imitate Splunk KV-store output, so that we
+# can test the patterns in local environment.
+def get_compiled_rules_as_json():
+    compiled_json = []
+
+    with open(CURRENT_DIR + "/../rules/compiled", 'r') as fd:
+        version = next(fd).strip("\n")
+        version = int(version.split("=")[1])
+
+        delim = next(fd).strip("\n")
+        delim = delim.split("=")[1]
+
+        for line in fd:
+            line = line.strip("\n").split(delim)
+
+            compiled_json.append({
+                "type": line[0],
+                "id": line[1],
+                "rule": line[2],
+                "version": version,
+                "state": 1,
+            })
+    
+    return compiled_json
+
+
 # Run a test among the content of the given file.
 # key: string to recognize the type of the test
 # file: file name storred in the tests/data folder
@@ -71,7 +98,7 @@ def test_from_file(key: str, file: str, match, must_match = None):
 
 
 # Test all the exploits.
-patterns.build()
+patterns.build(rules=get_compiled_rules_as_json())
 test_from_file("RCE", "rce.txt", match=lambda x: http.is_suspicious_url(x), must_match=True)
 test_from_file("XSS", "xss.txt", match=lambda x: http.is_suspicious_url(x), must_match=True)
 test_from_file("LFI", "lfi.txt", match=lambda x: http.is_suspicious_url(x), must_match=True)
