@@ -59,10 +59,10 @@ class CheckInjectionCommand(StreamingCommand):
         for event in events:
             rules_triggered = []
 
-            if self.hasParameter('useragent') and http.is_suspicious_useragent(self.getParamValue('useragent', event)):
+            if self.hasParameter('useragent') and http.is_suspicious_user_agent(self.getParamValue('useragent', event)):
                 rules_triggered.append("USER_AGENT")
 
-            if self.hasParameter('language') and http.is_suspicious_language(self.getParamValue('language', event)):
+            if self.hasParameter('language') and http.is_suspicious_accept_language(self.getParamValue('language', event)):
                 rules_triggered.append("ACCEPT_LANGUAGE")
 
             if self.hasParameter('url'):

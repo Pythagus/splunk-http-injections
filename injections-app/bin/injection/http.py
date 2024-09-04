@@ -12,6 +12,10 @@ except ImportError:
 # determines whether this URL contains a suspicious
 # pattern like XSS, SQL-injection, etc.
 def is_suspicious_url(url: str):
+    # If no patterns were built, then do nothing.
+    if patterns.url is None:
+        return None
+    
     cleaned = clean_url(url)
 
     # cleaned can be none if it is a worthless url.
@@ -23,7 +27,7 @@ def is_suspicious_url(url: str):
     # by the same character (i.e. 'A') to test the server's 
     # capacity to handle such a request.
     if is_suspicious_long_url(cleaned):
-        return None
+        return "LONG_URL"
     
     # Let the magic happen here: check trace of any injection.
     return patterns.url.match(cleaned)
@@ -48,16 +52,22 @@ def is_suspicious_long_url(url: str):
 # For now, this is only based on a blacklist and not on
 # the format of the user agent because there is no official
 # standard. So, that's not an easy topic. WIP.
-def is_suspicious_useragent(useragent: str):
+def is_suspicious_user_agent(useragent: str):
+    if patterns.user_agent is not None:
+        return False
+    
     useragent = useragent.strip()
 
-    return len(useragent) > 0 and patterns.useragent.search(useragent) is not None
+    return len(useragent) > 0 and patterns.user_agent.search(useragent) is not None
 
 
 # Determine whether the given X-Forwarded-For value is
 # suspicious. This field should only contain an IP or an
 # array of IP.
 def is_suspicious_xff(xff: str):
+    if patterns.xff is None:
+        return False
+    
     xff = xff.strip()
 
     return len(xff) > 0 and patterns.xff.search(xff) is None
@@ -67,10 +77,13 @@ def is_suspicious_xff(xff: str):
 # is appropriate, meaning that it follows the convention.
 #
 # See https://datatracker.ietf.org/doc/html/rfc3282
-def is_suspicious_language(language: str):
+def is_suspicious_accept_language(language: str):
+    if patterns.accept_language is None:
+        return False
+    
     language = language.strip()
 
-    return len(language) > 0 and patterns.language.search(language) is None
+    return len(language) > 0 and patterns.accept_language.search(language) is None
     
 
 # This function will clean the accessed HTTP url to remove
