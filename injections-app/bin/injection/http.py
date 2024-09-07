@@ -8,6 +8,27 @@ except ImportError:
     from urllib import unquote
 
 
+ENCODING_TRANSLATIONS = {
+    # '.' encodings.
+    '%c0%2e': '.',
+    '%c0%ae': '.',
+    '%25c0%25ae': '.',
+    '0x2e': '.',
+    '%uff0e': '.',
+
+    # '/' or '\' encodings.
+    '%25c0%25af': '/',
+    '%25c1%259c': '/',
+    '%c0%af': '/',
+    '0x2f': '/',
+    '%c0%2f': '/',
+    '%u2215': '/',
+    '%c0%5c': '\\',
+    '0x5c': '\\',
+    '%u2216': '\\',
+}
+
+
 # This function takes an URL in parameter and
 # determines whether this URL contains a suspicious
 # pattern like XSS, SQL-injection, etc.
@@ -106,6 +127,15 @@ def clean_url(input: str):
             return ""
         
         cleaned = cleaned[index_of_first_slash:]
+
+    # Replace common specific-encodings.
+    for c in ENCODING_TRANSLATIONS:
+        if c in cleaned:
+            cleaned = cleaned.replace(c, ENCODING_TRANSLATIONS[c])
+
+    # Remove the "end-of-string" character.
+    if cleaned.endswith('%00'):
+        cleaned = cleaned.strip('%00')
 
     cleaned = html.unescape(cleaned)
     cleaned = unquote(cleaned)
