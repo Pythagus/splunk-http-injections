@@ -114,7 +114,7 @@ patterns_rce = {
     # PHP code.
     "RCE_PHP_1": r"<\?php", # <?php
     "RCE_PHP_2": r"\b(phpinfo|phpversion|system|passthru|exec|shell_exec|backticks|base64_decode|sleep)(\s*)\(", # i.e. phpinfo()
-    "RCE_PHP_3": r"\b\$\_(server|get|post|files|cookie|session|request|env|http_get_vars|http_post_vars)", # Global variables: https://www.php.net/manual/en/language.variables.superglobals.php
+    "RCE_PHP_3": r"\W\$\_(server|get|post|files|cookie|session|request|env|http_get_vars|http_post_vars)", # Global variables: https://www.php.net/manual/en/language.variables.superglobals.php
     "RCE_PHP_4": r"(bzip2|expect|glob|phar|ogg|rar|ssh2|zip|zlib|file|php):\/\/", # PHP local file wrapper.
     "RCE_PHP_COMMANDS_1": r"\ballow_url_(fopen|include)\W",
 
@@ -122,7 +122,7 @@ patterns_rce = {
     "RCE_JAVA_1": r"\bjava\.(io|lang|net|util)\.",
 
     # Bash code.
-    "RCE_OS_1": r"\b(echo|nslookup|printenv|which|wget|curl|whoami|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)(\s|{|\()",
+    "RCE_OS_1": r"\b(echo|nslookup|printenv|which|wget|curl|whoami|exit|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)\b",
 
     # Windows.
     "RCE_WINDOWS_1": r"(%systemroot%|hklm\\system\\)",

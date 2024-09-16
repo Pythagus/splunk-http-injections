@@ -19,11 +19,11 @@ XSS###XSS_FUNCTION_RENAME###\b[a-z]=[a-z]+,[a-z]\([^\)]*\)(\W|$)
 RCE###RCE_HTTP_1###\b(oast\.pro|oast\.live|oast\.site|oast\.online|oast\.fun|oast\.me|bxss\.me|interact\.sh|evil\.com|cirt\.net)
 RCE###RCE_PHP_1###<\?php
 RCE###RCE_PHP_2###\b(phpinfo|phpversion|system|passthru|exec|shell_exec|backticks|base64_decode|sleep)(\s*)\(
-RCE###RCE_PHP_3###\b\$\_(server|get|post|files|cookie|session|request|env|http_get_vars|http_post_vars)
+RCE###RCE_PHP_3###\W\$\_(server|get|post|files|cookie|session|request|env|http_get_vars|http_post_vars)
 RCE###RCE_PHP_4###(bzip2|expect|glob|phar|ogg|rar|ssh2|zip|zlib|file|php):\/\/
 RCE###RCE_PHP_COMMANDS_1###\ballow_url_(fopen|include)\W
 RCE###RCE_JAVA_1###\bjava\.(io|lang|net|util)\.
-RCE###RCE_OS_1###\b(echo|nslookup|printenv|which|wget|curl|whoami|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)(\s|{|\()
+RCE###RCE_OS_1###\b(echo|nslookup|printenv|which|wget|curl|whoami|exit|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)\b
 RCE###RCE_WINDOWS_1###(%systemroot%|hklm\\system\\)
 SQLI###SQL_1###\b(or|and|having|where)(\s|:|\(|\"|\')*[0-9xya]+(\)|\"|\'|\s)*=+(\s|\(|\"|\')*[0-9axy]+
 SQLI###SQL_2###\b(select|insert|update|delete|drop|alter|create|union|waitfor(\s+)delay|(order(\s+)by))\s+
