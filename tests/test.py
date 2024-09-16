@@ -12,7 +12,7 @@ import os
 
 # Include the librairy to the Python lib path.
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(1, CURRENT_DIR + "/../injections-app/bin")
+sys.path.insert(1, CURRENT_DIR + "/../http-injections-app/bin")
 
 # Now we can import the injection librairy.
 from injection import patterns
@@ -86,7 +86,8 @@ def test_from_file(key: str, file: str, match, must_match = None):
                 failures += 1
 
                 if is_csv or print_failures:
-                    print("Failed:", (line[0] if is_csv else line).strip("\n"))
+                    log = (line[0] if is_csv else line).strip("\n")
+                    print("Failed:", log, " ==> ", http.clean_url(log))
 
     # Display the results.
     print("[%s]" % key)
