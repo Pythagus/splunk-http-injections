@@ -4,10 +4,12 @@
 # update the application's code in SplunkBase.
 #
 # Author: Damien MOLINA
-# Date: 2024-08-29
+# 
+# 2024-08-29: First version of the script
+# 2024-09-16: Rename the app
 
 # The file name of the generated application.
-OUTPUT_FILE=injections.tar.gz
+OUTPUT_FILE=http-injections-app.tar.gz
 
 # If the output file already exists, then
 # delete it to generate a new one.
@@ -20,7 +22,6 @@ COPYFILE_DISABLE=1 tar \
     --exclude-vcs \
     --exclude="__pycache__" \
     --exclude="log" \
-    --exclude="injections-app/bin/injection/compiled_rules.py" \
     --format ustar \
     -cvzf \
-    injections.tar.gz injections-app
+    $OUTPUT_FILE http-injections-app
