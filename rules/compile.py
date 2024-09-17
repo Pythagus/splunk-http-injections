@@ -4,18 +4,20 @@ import os
 # Global variables.
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 GLOBAL_DELIMITER = "|"
-RULE_DELIMITER = "###"
+RULE_DELIMITER = "#"
 
+def _encode_str(string: str):
+    return string.encode("utf-8").hex()
 
 # This function encodes a rule / set of rules using
 # the delimiter.
-def encode(type, id, input):
-    if isinstance(input, str):
-        return str(type + RULE_DELIMITER + id + RULE_DELIMITER + input).encode("utf-8").hex()
+def encode(type, id, rule):
+    if isinstance(rule, str):
+        return type + RULE_DELIMITER + id + RULE_DELIMITER + _encode_str(rule)
     
     output = ""
-    for var in input:
-        output = output + GLOBAL_DELIMITER + encode(type, var, input[var])
+    for var in rule:
+        output = output + GLOBAL_DELIMITER + encode(type, var, rule[var])
 
     return output
 
@@ -23,7 +25,7 @@ def encode(type, id, input):
 # Compile all the rules contained in the patterns.py file in
 # a way that can be treated by Splunk.
 def compile():
-    output = "version=" + str(patterns.version) + GLOBAL_DELIMITER + "delim=" + RULE_DELIMITER
+    output = "version=" + str(patterns.version)
 
     # Suspicious URL.
     output += encode("LFI", None, patterns.patterns_lfi)

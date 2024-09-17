@@ -28,26 +28,30 @@ print_failures = False
 # used to imitate Splunk KV-store output, so that we
 # can test the patterns in local environment.
 def get_compiled_rules_as_json():
-    compiled_json = []
+    compiled_json = {}
+    version = None
 
     with open(CURRENT_DIR + "/../rules/compiled", 'r') as fd:
-        version = next(fd).strip("\n")
-        version = int(version.split("=")[1])
-
-        delim = next(fd).strip("\n")
-        delim = delim.split("=")[1]
-
-        for line in fd:
-            line = line.strip("\n").split(delim)
-
-            compiled_json.append({
-                "type": line[0],
-                "id": line[1],
-                "rule": line[2],
-                "version": version,
-                "state": 1,
-            })
+        file_content = next(fd).split("|")
     
+        i = 0
+        for line in file_content:
+            if i == 0:
+                version = int(line.split("=")[1])
+            else:
+                line = line.split("#")
+
+                rule_id = str(line[1])
+                compiled_json[rule_id] = {
+                    "type": line[0],
+                    "id": rule_id,
+                    "rule": bytes.fromhex(line[2]).decode('utf-8'),
+                    "version": version,
+                    "state": 1,
+                }
+
+            i += 1
+            
     return compiled_json
 
 
