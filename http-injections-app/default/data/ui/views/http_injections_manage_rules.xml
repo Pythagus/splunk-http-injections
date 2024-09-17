@@ -1,0 +1,154 @@
+<form version="1.1" theme="light">
+  <label>HTTP injections - Manage rules</label>
+  <description>This dashboard allows you to update the HTTP rules storred in the HttpInjections_Rules kv-store.</description>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="mode" searchWhenChanged="true">
+      <label>Mode</label>
+      <choice value="show">Show</choice>
+      <choice value="update">Update</choice>
+      <default>show</default>
+      <change>
+        <condition value="show">
+          <set token="show_show_panels">true</set>
+          <unset token="show_update_panels"></unset>
+        </condition>
+        <condition value="update">
+          <set token="show_update_panels">true</set>
+          <unset token="show_show_panels"></unset>
+        </condition>
+      </change>
+    </input>
+    <input type="text" token="http_rules" id="http_rules_textarea" depends="$show_update_panels$">
+      <label>Rules</label>
+    </input>
+  </fieldset>
+  <row depends="$DEBUG$">
+    <panel>
+      <html>
+        <style>
+          #http_rules_textarea {
+            width: 200px ;
+          }
+          
+          #show_count_rules_panel {
+            width: 50% !important ;
+          }
+          
+          div[id^="show_rules_details_"] {
+            width: 25% !important ;
+          }
+        </style>
+      </html>
+    </panel>
+  </row>
+  <row depends="$show_update_panels$">
+    <panel>
+      <table>
+        <search>
+          <query>| makeresults
+| fields - _time
+| eval raw = "$http_rules$"
+| rex field=raw "version=(?&lt;version&gt;[^\|]+)"
+| makemv delim="|" raw
+| mvexpand raw
+| where ! match(raw, "^version")
+
+| eval decoded = split(raw, "#")
+| eval rule = urldecode(replace(mvindex(decoded, 2), "([a-f0-9]{2})","%\1"))
+| eval rule_type = mvindex(decoded, 0), rule_id = mvindex(decoded, 1), rule = mvindex(decoded, 2)
+| table rule_id, rule_type, rule, version
+``` To decode the rule: ```
+| eval rule = urldecode(replace(rule, "([a-f0-9]{2})","%\1"))
+
+
+``` To remove ```
+| eval auto_update = 1, status = 1</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel id="show_count_rules_panel">
+      <chart>
+        <title>Active rules by malicious behavior</title>
+        <search base="base_show_rules_search">
+          <query>| search status="1" rule_type IN ("XSS", "LFI", "RCE", "SQLI")
+| stats count by rule_type</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"count": #55C169}</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel id="show_rules_details_status">
+      <chart>
+        <title>Rules status (active / inactive)</title>
+        <search base="base_show_rules_search">
+          <query>| eval status = case(
+   status=0, "Inactive",
+   status=1, "Active",
+   true(), "Unknown"
+)
+| stats count by status</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="charting.fieldColors">{"Active": #55C169, "Inactive": #D41F1F, "Unknown":0xC4C4C0}</option>
+        <option name="charting.chart.showPercent">true</option>
+      </chart>
+    </panel>
+    <panel id="show_rules_details_autoupdate">
+      <chart>
+        <title>Rule auto update</title>
+        <search base="base_show_rules_search">
+          <query>| eval auto_update = case(
+   auto_update=0, "Disabled",
+   auto_update=1, "Enabled",
+   true(), "Unknown"
+)
+| stats count by auto_update</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.showPercent">1</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Enabled": #55C169, "Disabled": #D41F1F, "Unknown":0xC4C4C0}</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row depends="$show_show_panels$">
+    <panel>
+      <table>
+        <search id="base_show_rules_search">
+          <query>| inputlookup HttpInjections_Rules
+| eval rule = urldecode(replace(rule, "([a-f0-9]{2})","%\1"))
+| table rule_type, rule_id, rule, version, status, auto_update</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="rule_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="status">
+          <colorPalette type="map">{"0":#D41F1F,"1":#55C169}</colorPalette>
+        </format>
+        <format type="color" field="auto_update">
+          <colorPalette type="map">{"0":#D41F1F,"1":#55C169}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>
