@@ -31,10 +31,10 @@ patterns_lfi = {
     "LFI_DIRECTORY_TRAVERSAL": r"(\/|\\|\%)+(\.)+(\/|\\|\%)+(\.)+",
 
     # Linux system files.
-    "LFI_2": r"(^|\/)\.(ssh|git|bash|env|config|htaccess|htpasswd|composer|ansible|babel|composer|config|eslint|putty|idea|docker|appledb|xauthority|xdefaults|xresources|passwd)", # Hidden files/folders like .git
-    "LFI_3": r"\b((boot|php|system|desktop|win)\.ini|httpd\.conf|(log|logs)(\/|\\)(access|error)(\.|\_)log)", # Sensitive files
-    "LFI_4": r"(\b|\/|\\)(var|etc|usr|proc|logs)(\/|\\)+(log|www|mail|bin|lib|run|spool|local|self|httpd|apache|passwd|shadow|nginx|mysql|host|security|ssh|adm|cpanel|ports|sbin|([a-z0-9\-]+)(\.d|ftpd))", # Sensitive Linux folders
-    "LFI_5": r"\.(pem|py|key|yml|sh|ppk|p12|conf|sqlite|sqlitedb|sql|db|sql\.\w+|tar|tar\.\w+|war|rar|7z|bz2|lz|swp)$", # Suspicious files that shouldn't be accessed via URL.
+    "LFI_HIDDEN_FILES": r"(^|\/)\.(ssh|git|bash|env|config|htaccess|htpasswd|composer|ansible|babel|composer|config|eslint|putty|idea|docker|appledb|xauthority|xdefaults|xresources|passwd)", # Hidden files/folders like .git
+    "LFI_CONFIG_FILES": r"\b((boot|php|system|desktop|win)\.ini|httpd\.conf|(log|logs)(\/|\\)(access|error)(\.|\_)log)", # Sensitive files
+    "LFI_LINUX_FOLDERS": r"(\b|\/|\\)(var|etc|usr|proc|logs)(\/|\\)+(log|www|mail|bin|lib|run|spool|local|self|httpd|apache|passwd|shadow|nginx|mysql|host|security|ssh|adm|cpanel|ports|sbin|([a-z0-9\-]+)(\.d|ftpd))", # Sensitive Linux folders
+    "LFI_CRITICAL_FILES": r"\.(pem|py|key|yml|sh|ppk|p12|conf|sqlite|sqlitedb|sql|db|sql\.\w+|tar|tar\.\w+|war|rar|7z|bz2|lz|swp)$", # Suspicious files that shouldn't be accessed via URL.
 
     # Other files.
     "LFI_WINDOWS_FILESYSTEM": r"\b(c|d):((\/|\\)|windows|users|program)", # Windows system files.
@@ -62,12 +62,12 @@ patterns_lfi = {
 # See: https://owasp.org/www-community/attacks/SQL_Injection
 #
 patterns_sqli = {
-    "SQL_1": r"\b(or|and|having|where)(\s|:|\(|\"|\')*[0-9xya]+(\)|\"|\'|\s)*=+(\s|\(|\"|\')*[0-9axy]+", # AND/OR 1=1
-    "SQL_2": r"\b(select|insert|update|delete|drop|alter|create|union|waitfor(\s+)delay|(order(\s+)by))\s+", # SQL keywords
-    "SQL_3": r"\b(pg_sleep|benchmark|randomblob|sleep|concat|concat_ws|extractvalue|updatexml|tdesencrypt|md5|chr)(\s*)\(", # SQL functions
-    "SQL_4": r"\b(or|and)((\s+)true|(.*)is(\s*)null)", # Arithmetic evaluation
-    "SQL_5": r"\b(xp_cmdshell|xp_enumgroups|xp_grantlogin|xp_logevent|xp_logininfo|xp_msver|xp_revokelogin|xp_sprintf|xp_sqlmaint|xp_sscanf|xp_regread)", # Microsoft SQL server commands
-    "SQL_6": r"\b(bin|ord|hex|char)(\s*)(\(|\[)", # SQL 'arithmetic' functions
+    "SQL_LOGICS": r"\b(or|and|having|where)(\s|:|\(|\"|\')*[0-9xya]+(\)|\"|\'|\s)*=+(\s|\(|\"|\')*[0-9axy]+", # AND/OR 1=1
+    "SQL_COMMANDS": r"\b(select|insert|update|delete|drop|alter|create|union|waitfor(\s+)delay|(order(\s+)by))\s+", # SQL keywords
+    "SQL_SQL_LOGIC_COMMANDS": r"\b(pg_sleep|benchmark|randomblob|sleep|concat|concat_ws|extractvalue|updatexml|tdesencrypt|md5|chr)(\s*)\(", # SQL functions
+    "SQL_ARITHMETICS": r"\b(or|and)((\s+)true|(.*)is(\s*)null)", # Arithmetic evaluation
+    "SQL_MICROSOFT_SQL_COMMANDS": r"\b(xp_cmdshell|xp_enumgroups|xp_grantlogin|xp_logevent|xp_logininfo|xp_msver|xp_revokelogin|xp_sprintf|xp_sqlmaint|xp_sscanf|xp_regread)", # Microsoft SQL server commands
+    "SQL_SQL_ARITHEMTIC_COMMANDS": r"\b(bin|ord|hex|char)(\s*)(\(|\[)", # SQL 'arithmetic' functions
 }
 
 #
@@ -84,12 +84,12 @@ patterns_sqli = {
 #
 # See: https://owasp.org/www-community/attacks/xss/
 patterns_xss = {
-    "XSS_1": r"<(\s*)script(\s*)", # <script> tags
-    "XSS_2": r"\bon([a-z]+)(\s|=| |})", # Javascript keywords
-    "XSS_3": r"\b(throw|alert|prompt)(\s*)(\s|{|\(|\)|\`)", # Some Javascript functions like alert(3)
-    "XSS_4": r"\b(window|top)(\s*)\[[^\]]*\]", # Some javascript functions like top['alert']
-    "XSS_5": r"\b(java|live|vb|j|w)script(\s*):", # Scripting languages
-    "XSS_6": r"\b(document\.(domain|window|write|cookie|location)|response\.write)", # Document functions
+    "XSS_SCRIPT_TAG": r"<(\s*)script(\s*)", # <script> tags
+    "XSS_EVENTS_KEYWORDS": r"\bon([a-z]+)(\s|=| |})", # Javascript keywords
+    "XSS_FUNCTIONS": r"\b(throw|alert|prompt)(\s*)(\s|{|\(|\)|\`)", # Some Javascript functions like alert(3)
+    "XSS_GLOBAL_VARIABLES_ARRAYS": r"\b(window|top)(\s*)\[[^\]]*\]", # Some javascript functions like top['alert']
+    "XSS_SCRIPTING_LANGUAGES": r"\b(java|live|vb|j|w)script(\s*):", # Scripting languages
+    "XSS_GLOBAL_VARIABLES": r"\b(document\.(domain|window|write|cookie|location)|response\.write)", # Document functions
     "XSS_FUNCTION_RENAME": r"\b[a-z]=[a-z]+,[a-z]\([^\)]*\)(\W|$)", # Function renaming like a=alert,a(1)
 }
 
@@ -109,23 +109,23 @@ patterns_xss = {
 #      - https://owasp.org/www-community/attacks/Command_Injection
 patterns_rce = {
     # HTTP redirections.
-    "RCE_HTTP_1": r"\b(oast\.pro|oast\.live|oast\.site|oast\.online|oast\.fun|oast\.me|bxss\.me|interact\.sh|evil\.com|cirt\.net)", # Redirection to known malicious websites.
+    "RCE_HTTP_REDIRECTIONS_KNOWN_MALICIOUS_WEBSITES": r"\b(oast\.(pro|live|site|online|fun|me)|bxss\.me|interact\.sh|evil\.com|cirt\.net)", # Redirection to known malicious websites.
     
     # PHP code.
-    "RCE_PHP_1": r"<\?php", # <?php
-    "RCE_PHP_2": r"\b(phpinfo|phpversion|system|passthru|exec|shell_exec|backticks|base64_decode|sleep)(\s*)\(", # i.e. phpinfo()
-    "RCE_PHP_3": r"\W\$\_(server|get|post|files|cookie|session|request|env|http_get_vars|http_post_vars)", # Global variables: https://www.php.net/manual/en/language.variables.superglobals.php
-    "RCE_PHP_4": r"(bzip2|expect|glob|phar|ogg|rar|ssh2|zip|zlib|file|php):\/\/", # PHP local file wrapper.
-    "RCE_PHP_COMMANDS_1": r"\ballow_url_(fopen|include)\W",
+    "RCE_PHP_TAG": r"<\?php", # <?php
+    "RCE_PHP_FUNCTIONS": r"\b(phpinfo|phpversion|system|passthru|exec|shell_exec|backticks|base64_decode|sleep)(\s*)\(", # i.e. phpinfo()
+    "RCE_PHP_GLOBAL_VARIABLES": r"\W\$\_(server|get|post|files|cookie|session|request|env|http_get_vars|http_post_vars)", # Global variables: https://www.php.net/manual/en/language.variables.superglobals.php
+    "RCE_PHP_LOCAL_FILE_WRAPPERS": r"(bzip2|expect|glob|phar|ogg|rar|ssh2|zip|zlib|file|php):\/\/", # PHP local file wrapper.
+    "RCE_PHP_COMMANDS": r"\ballow_url_(fopen|include)\W",
 
     # Java code.
-    "RCE_JAVA_1": r"\bjava\.(io|lang|net|util)\.",
+    "RCE_JAVA_LIBRARIES": r"\bjava\.(io|lang|net|util)\.",
 
     # Bash code.
-    "RCE_OS_1": r"\b(echo|nslookup|printenv|which|wget|curl|whoami|exit|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)\b",
+    "RCE_BASH_COMMANDS": r"\b(echo|nslookup|printenv|which|wget|curl|whoami|exit|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)\b",
 
     # Windows.
-    "RCE_WINDOWS_1": r"(%systemroot%|hklm\\system\\)",
+    "RCE_WINDOWS_REGISTRIES": r"(%systemroot%|hklm\\system\\)",
 }
 
 #
