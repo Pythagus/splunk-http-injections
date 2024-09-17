@@ -122,7 +122,7 @@ patterns_rce = {
     "RCE_JAVA_LIBRARIES": r"\bjava\.(io|lang|net|util)\.",
 
     # Bash code.
-    "RCE_BASH_COMMANDS": r"\b(echo|nslookup|printenv|which|wget|curl|whoami|exit|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)\b",
+    "RCE_BASH_COMMANDS": r"\b(echo|nslookup|printenv|print|which|wget|curl|whoami|exit|ping|uname|systeminfo|sysinfo|ifconfig|sleep|perl|netstat|ipconfig|nc|net(\s+)(localgroup|user|view)|netsh|dir|ls|pwd)\b([^\.]|$)",
 
     # Windows.
     "RCE_WINDOWS_REGISTRIES": r"(%systemroot%|hklm\\system\\)",
