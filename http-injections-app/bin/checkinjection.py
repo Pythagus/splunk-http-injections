@@ -1,9 +1,42 @@
 #!/usr/bin/env python
 
 import sys
+from splunklib.client import Service
 from splunklib.searchcommands import dispatch, StreamingCommand, Configuration, Option, validators
 from injection import patterns
 from injection import http
+
+
+# Name of the KV-store used to store the HTTP rules.
+KVSTORE_NAME = "HttpInjections_Rules"
+
+# Multiple error codes used to know where the
+# script failed and raised an error.
+ERR_KVSTORE_RULES_RETRIEVAL = 40
+ERR_REGEX_COMPILATION = 41
+
+
+# Get the rules storred in the KV-store.
+def get_rules_from_kvstore(service: Service):
+    kvstore = service.kvstore[KVSTORE_NAME]
+    _entries = kvstore.data.query()
+
+    entries = {}
+    for entry in _entries:
+        rule_id = entry["rule_id"]
+        version = int(entry["version"])
+        actual_version = None if rule_id not in entries else int(entries[rule_id]["version"])
+
+        if entry["status"] and (actual_version is None or actual_version < version):
+            entries[rule_id] = {
+                "type": entry["rule_type"],
+                "id": entry["rule_id"],
+                "rule": bytes.fromhex(entry["rule"]).decode('utf-8'),
+                "version": version
+            }
+
+    return entries
+
 
 @Configuration()
 class CheckInjectionCommand(StreamingCommand):
@@ -51,8 +84,23 @@ class CheckInjectionCommand(StreamingCommand):
     # command executes. It is used to get the configuration
     # data from Splunk.
     def prepare(self):
+        # Try to get the rules from the KV-store.
+        try:
+            http_rules = get_rules_from_kvstore(self.service)
+        except Exception as e:
+            self.write_error(repr(e))
+            exit(1)
+        #except:
+        #    self.write_error("HttpInjections: Failed to load rules from KV-Store (%s)" % KVSTORE_NAME, e)
+        #    exit(ERR_KVSTORE_RULES_RETRIEVAL)
+
         # Build the regexes and local stuff.
-        patterns.build()
+        try:
+            patterns.build(rules=http_rules)
+        except patterns.HttpInjectionRegexCompilationFailure as e:
+            self.write_error(repr(e))
+            self.write_error("HttpInjections: Failed to compile regex: %s" % e.regex_key)
+            exit(ERR_REGEX_COMPILATION)
 
     # This is the method treating all the events.
     def stream(self, events):
