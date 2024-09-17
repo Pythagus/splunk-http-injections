@@ -77,24 +77,24 @@ def is_suspicious_long_url(url: str):
 # the format of the user agent because there is no official
 # standard. So, that's not an easy topic. WIP.
 def is_suspicious_user_agent(useragent: str):
-    if patterns.user_agent is not None:
-        return False
-    
     useragent = useragent.strip()
 
-    return len(useragent) > 0 and patterns.user_agent.search(useragent) is not None
+    if patterns.user_agent is None or len(useragent) <= 1:
+        return False
+    
+    return patterns.user_agent.search(useragent) is not None
 
 
 # Determine whether the given X-Forwarded-For value is
 # suspicious. This field should only contain an IP or an
 # array of IP.
 def is_suspicious_xff(xff: str):
-    if patterns.xff is None:
-        return False
-    
     xff = xff.strip()
 
-    return len(xff) > 0 and patterns.xff.search(xff) is None
+    if patterns.xff is None or len(xff) <= 1:
+        return False
+    
+    return patterns.xff.search(xff) is None
 
 
 # This function check whether the Accept-Language parameter
@@ -102,12 +102,12 @@ def is_suspicious_xff(xff: str):
 #
 # See https://datatracker.ietf.org/doc/html/rfc3282
 def is_suspicious_accept_language(language: str):
-    if patterns.accept_language is None:
-        return False
-    
     language = language.strip()
 
-    return len(language) > 0 and patterns.accept_language.search(language) is None
+    if patterns.accept_language is None or len(language) <= 1:
+        return False
+
+    return patterns.accept_language.search(language) is None
     
 
 # This function will clean the accessed HTTP url to remove
