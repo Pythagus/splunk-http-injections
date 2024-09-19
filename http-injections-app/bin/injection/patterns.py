@@ -4,6 +4,7 @@ import re
 url = None
 user_agent = None
 accept_language = None
+content_type = None
 xff = None
 worthless_asset = None
 # #
@@ -18,7 +19,10 @@ class HttpInjectionRegexCompilationFailure(RuntimeError):
 # This function is a wrapper used for catching
 # a regex compilation issue and send a message
 # to the end-user using the command.
-def _compile_regex(key, regex):
+def _compile_regex(key, regex = None):
+    if regex is None:
+        return None
+    
     try:
         return re.compile(regex)
     except re.error:
@@ -80,26 +84,19 @@ def build(rules):
     url.append(rules.get("SQLI", []))
     url.append(rules.get("XSS", []))
     url.append(rules.get("RCE", []))
-    #url.append(compiled_rules.pattern_wordpress)
 
     http_rules = dict(rules.get("HTTP"))
 
+    # If no rules were found, then it's a failure.
     if http_rules is None:
         return
     
+    # So that we can update global variables.
+    global user_agent, accept_language, content_type, xff, worthless_asset
+    
     # Build HTTP header patterns.
-    if "USER_AGENT" in http_rules:
-        global user_agent
-        user_agent = _compile_regex("USER_AGENT", http_rules.get("USER_AGENT"))
-
-    if "ACCEPT_LANGUAGE" in http_rules:
-        global accept_language
-        accept_language = _compile_regex("ACCEPT_LANGUAGE", http_rules.get("ACCEPT_LANGUAGE"))
-
-    if "XFF" in http_rules:
-        global xff
-        xff = _compile_regex("XFF", http_rules.get("XFF"))
-
-    if "WORTHLESS_ASSET_URL" in http_rules:
-        global worthless_asset
-        worthless_asset = _compile_regex("WORTHLESS_ASSET_URL", http_rules.get("WORTHLESS_ASSET_URL"))
+    user_agent      = _compile_regex("USER_AGENT", http_rules.get("USER_AGENT"))
+    accept_language = _compile_regex("ACCEPT_LANGUAGE", http_rules.get("ACCEPT_LANGUAGE"))
+    content_type    = _compile_regex("CONTENT_TYPE", http_rules.get("CONTENT_TYPE"))
+    xff             = _compile_regex("XFF", http_rules.get("XFF"))
+    worthless_asset = _compile_regex("WORTHLESS_ASSET_URL", http_rules.get("WORTHLESS_ASSET_URL"))

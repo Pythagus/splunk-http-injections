@@ -162,5 +162,8 @@ pattern_xff = r"^(((([0-9\.]{1,3}\.){3}[0-9]{1,3}|(?:\[)?[0-9a-f:]+(?:\])?)(?:\:
 # Legitimate Accept-Language values.
 pattern_accept_language = r"^(((?:,\s*)?([a-zA-Z]{2}(?:-[a-zA-Z0-9]{2,3})?|\*)(?:;(\s*)q=[0-9](?:\.[0-9])?)?)+)$"
 
+# Legitimate Content-Type values.
+pattern_content_type = r"^(application|audio|example|font|image|message|model|multipart|text|video)\/[a-z0-9\.\-_+,]+$"
+
 # Regex matching a legitimate asset URL like http://example.org/images/example.jpg
 pattern_worthless_asset_url = r"^([a-zA-Z0-9\/\.]+)$"

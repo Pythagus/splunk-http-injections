@@ -37,6 +37,7 @@ def compile():
     output += GLOBAL_DELIMITER + encode("HTTP", "USER_AGENT", patterns.pattern_user_agent)
     output += GLOBAL_DELIMITER + encode("HTTP", "XFF", patterns.pattern_xff)
     output += GLOBAL_DELIMITER + encode("HTTP", "ACCEPT_LANGUAGE", patterns.pattern_accept_language)
+    output += GLOBAL_DELIMITER + encode("HTTP", "CONTENT_TYPE", patterns.pattern_content_type)
     output += GLOBAL_DELIMITER + encode("HTTP", "WORTHLESS_ASSET_URL", patterns.pattern_worthless_asset_url)
 
     return output

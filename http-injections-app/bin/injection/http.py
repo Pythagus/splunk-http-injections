@@ -72,43 +72,50 @@ def is_suspicious_long_url(url: str):
     return False
 
 
+# Check whether the given input matches (or not) 
+# the regex given.
+def _check_if_matches_regex(regex, input: str, should_match):
+    input = input.strip()
+
+    if regex is None or len(input) <= 1:
+        return False
+    
+    match_something = regex.search(input) is not None
+    
+    return match_something != should_match
+
+
 # Determine whether the given user agent is suspicious.
 # For now, this is only based on a blacklist and not on
 # the format of the user agent because there is no official
 # standard. So, that's not an easy topic. WIP.
 def is_suspicious_user_agent(useragent: str):
-    useragent = useragent.strip()
-
-    if patterns.user_agent is None or len(useragent) <= 1:
-        return False
-    
-    return patterns.user_agent.search(useragent) is not None
+    return _check_if_matches_regex(patterns.user_agent, useragent, should_match=False)
 
 
 # Determine whether the given X-Forwarded-For value is
 # suspicious. This field should only contain an IP or an
 # array of IP.
 def is_suspicious_xff(xff: str):
-    xff = xff.strip()
-
-    if patterns.xff is None or len(xff) <= 1:
-        return False
-    
-    return patterns.xff.search(xff) is None
+    return _check_if_matches_regex(patterns.xff, xff, should_match=True)
 
 
-# This function check whether the Accept-Language parameter
+# This function checks whether the Accept-Language parameter
 # is appropriate, meaning that it follows the convention.
 #
 # See https://datatracker.ietf.org/doc/html/rfc3282
 def is_suspicious_accept_language(language: str):
-    language = language.strip()
-
-    if patterns.accept_language is None or len(language) <= 1:
-        return False
-
-    return patterns.accept_language.search(language) is None
+    return _check_if_matches_regex(patterns.accept_language, language, should_match=True)
     
+    
+# This function determines whether the given Content-Type value
+# is following the RFC6838 / RFC4855 regarding the expected
+# value.
+#
+# See https://www.iana.org/assignments/media-types/media-types.xhtml
+def is_suspicious_content_type(content: str):
+    return _check_if_matches_regex(patterns.content_type, content, should_match=True)
+
 
 # This function will clean the accessed HTTP url to remove
 # the unicode characters, and return a lowercase field, so
