@@ -39,12 +39,6 @@ def compile():
     output += GLOBAL_DELIMITER + encode("HTTP", "ACCEPT_LANGUAGE", patterns.pattern_accept_language)
     output += GLOBAL_DELIMITER + encode("HTTP", "WORTHLESS_ASSET_URL", patterns.pattern_worthless_asset_url)
 
-    # Encode the specific-applications patterns.
-    products = patterns.patterns_custom_apps
-    for product in products:
-        for type in products[product]:
-            output += encode(product + "." + str(type).upper(), None, products[product][type])
-
     return output
 
 
