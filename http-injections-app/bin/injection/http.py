@@ -117,6 +117,27 @@ def is_suspicious_content_type(content: str):
     return _check_if_matches_regex(patterns.content_type, content, should_match=True)
 
 
+# This function determines whether a cookie is following
+# the standard references:
+# - RFC6265 section 4.1.1
+# - RFC2616 section 2.2
+#
+# Note: we could also have called the "is_suspicious_url"
+# function. But this function is really time-consuming, so
+# I decided to only focus on the convention defined by the RFC.
+def is_suspicious_cookie(cookies: str):
+    if patterns.cookie is None:
+        return False
+    
+    # Following RFC6265 section 4.1.1, the cookies
+    # are delimited with a semicolon.
+    for cookie in cookies.split(";"):
+        if _check_if_matches_regex(patterns.cookie, cookie, should_match=True):
+            return True
+
+    return False
+
+
 # This function will clean the accessed HTTP url to remove
 # the unicode characters, and return a lowercase field, so
 # that the next functions don't have to deal with the

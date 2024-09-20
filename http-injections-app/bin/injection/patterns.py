@@ -5,6 +5,7 @@ url = None
 user_agent = None
 accept_language = None
 content_type = None
+cookie = None
 xff = None
 worthless_asset = None
 # #
@@ -92,11 +93,12 @@ def build(rules):
         return
     
     # So that we can update global variables.
-    global user_agent, accept_language, content_type, xff, worthless_asset
+    global user_agent, accept_language, content_type, xff, worthless_asset, cookie
     
     # Build HTTP header patterns.
     user_agent      = _compile_regex("USER_AGENT", http_rules.get("USER_AGENT"))
     accept_language = _compile_regex("ACCEPT_LANGUAGE", http_rules.get("ACCEPT_LANGUAGE"))
     content_type    = _compile_regex("CONTENT_TYPE", http_rules.get("CONTENT_TYPE"))
+    cookie          = _compile_regex("COOKIE", http_rules.get("COOKIE"))
     xff             = _compile_regex("XFF", http_rules.get("XFF"))
     worthless_asset = _compile_regex("WORTHLESS_ASSET_URL", http_rules.get("WORTHLESS_ASSET_URL"))

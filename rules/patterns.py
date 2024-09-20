@@ -165,5 +165,11 @@ pattern_accept_language = r"^(((?:,\s*)?([a-zA-Z]{2}(?:-[a-zA-Z0-9]{2,3})?|\*)(?
 # Legitimate Content-Type values.
 pattern_content_type = r"^(application|audio|example|font|image|message|model|multipart|text|video)\/[a-z0-9\.\-_+,]+$"
 
+# Legitimate cookie values.
+# A cookie is considered "legitimate" if it follows:
+# - RFC6265 section 4.1.1
+# - RFC2616 section 2.2
+pattern_cookie = r"^([^\(\)<>,;:\\\"\/\[\]\?=\{\}]+)=([^\\,;\"\s]*)$"
+
 # Regex matching a legitimate asset URL like http://example.org/images/example.jpg
 pattern_worthless_asset_url = r"^([a-zA-Z0-9\/\.]+)$"

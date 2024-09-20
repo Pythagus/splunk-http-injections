@@ -111,3 +111,4 @@ test_from_file("SQLI", "sqli.txt", match=lambda x: http.is_suspicious_url(x), mu
 test_from_file("XFF", "xff.csv", match=lambda x: http.is_suspicious_xff(x))
 test_from_file("ACCEPT_LANGUAGE", "accept_language.csv", match=lambda x: http.is_suspicious_accept_language(x))
 test_from_file("CONTENT_TYPE", "content_type.csv", match=lambda x: http.is_suspicious_content_type(x))
+test_from_file("COOKIE", "cookie.csv", match=lambda x: http.is_suspicious_cookie(x))
