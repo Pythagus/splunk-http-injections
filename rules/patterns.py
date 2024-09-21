@@ -169,7 +169,7 @@ pattern_content_type = r"^(application|audio|example|font|image|message|model|mu
 # A cookie is considered "legitimate" if it follows:
 # - RFC6265 section 4.1.1
 # - RFC2616 section 2.2
-pattern_cookie = r"^([^\(\)<>,;:\\\"\/\[\]\?=\{\}]+)=([^\\,;\"\s]*)$"
+pattern_cookie = r"^([^\(\)<>,;:\\\"\/\[\]\?=\{\}]+)=([^\\,;\"]*)$"
 
 # Regex matching a legitimate asset URL like http://example.org/images/example.jpg
 pattern_worthless_asset_url = r"^([a-zA-Z0-9\/\.]+)$"
