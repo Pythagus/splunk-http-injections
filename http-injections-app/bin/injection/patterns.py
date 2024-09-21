@@ -34,8 +34,9 @@ def _compile_regex(key, regex = None):
 class RegexMatcher(object):
 
     # Build the regex matcher instance.
-    def __init__(self, patterns: dict = None):
+    def __init__(self, patterns: dict = None, deep = False):
         self.regex = {}
+        self.deep = deep
 
         if patterns:
             self.append(patterns)
@@ -48,11 +49,16 @@ class RegexMatcher(object):
     # This method will return the id of the first rule that
     # matched the given input or False if no rule triggered.
     def match(self, input: str):
+        rules = []
+
         for key in self.regex:
             if self.regex[key].search(input) is not None:
-                return key
+                rules.append(key)
+
+                if not self.deep:
+                    break
             
-        return False
+        return False if len(rules) == 0 else rules
 
 
 # Load the rules from the storage facility
@@ -75,12 +81,12 @@ def _transform_rules(rules):
 # This is not done when the file is loaded to let Splunk
 # decide when is the appropriate time (when the command 
 # calls the prepare() method).
-def build(rules):
+def build(rules, deep=False):
     rules = _transform_rules(rules)
 
     # Build the URL patterns.
     global url
-    url = RegexMatcher()
+    url = RegexMatcher(deep=deep)
     url.append(rules.get("LFI", []))
     url.append(rules.get("SQLI", []))
     url.append(rules.get("XSS", []))
