@@ -44,25 +44,80 @@
   <row depends="$show_update_panels$">
     <panel>
       <table>
-        <search>
+        <title>New set of rules</title>
+        <search base="base_update_rules_search">
+          <query>| fields - key
+| eval rule = urldecode(replace(rule, "([a-f0-9]{2})","%\1"))</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="changed">
+          <colorPalette type="map">{"true":#2EA39B,"false":#3C444D}</colorPalette>
+        </format>
+        <format type="color" field="rule_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row depends="$show_update_panels$">
+    <panel>
+      <table>
+        <title>Updated rules</title>
+        <search base="base_update_rules_search">
+          <query>| fields - key
+| search changed="true"
+| lookup HttpInjections_Rules rule_id OUTPUTNEW rule as current_rule
+| eval rule = urldecode(replace(rule, "([a-f0-9]{2})","%\1"))
+| eval current_rule = urldecode(replace(current_rule, "([a-f0-9]{2})","%\1"))
+| eval current_rule = coalesce(current_rule, "None")
+| eval rule = if(isnotnull(current_rule) and rule != current_rule, "Old rule: " + current_rule + "
+New rule: " + rule, rule)
+| fields - current_rule</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="changed">
+          <colorPalette type="map">{"true":#2EA39B,"false":#3C444D}</colorPalette>
+        </format>
+        <format type="color" field="rule_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row depends="$DEBUG$">
+    <panel>
+      <table>
+        <title>New set of rules</title>
+        <search id="base_update_rules_search">
           <query>| makeresults
 | fields - _time
 | eval raw = "$http_rules$"
-| rex field=raw "version=(?&lt;version&gt;[^\|]+)"
+| rex field=raw "version=(?&lt;new_version&gt;[^\|]+)"
 | makemv delim="|" raw
 | mvexpand raw
 | where ! match(raw, "^version")
 
 | eval decoded = split(raw, "#")
 | eval rule = urldecode(replace(mvindex(decoded, 2), "([a-f0-9]{2})","%\1"))
-| eval rule_type = mvindex(decoded, 0), rule_id = mvindex(decoded, 1), rule = mvindex(decoded, 2)
-| table rule_id, rule_type, rule, version
-``` To decode the rule: ```
-| eval rule = urldecode(replace(rule, "([a-f0-9]{2})","%\1"))
+| eval rule_type = mvindex(decoded, 0), rule_id = mvindex(decoded, 1), new_rule = mvindex(decoded, 2)
+| table rule_id, rule_type, new_rule, new_version
 
+| lookup HttpInjections_Rules rule_id OUTPUTNEW _key as key, rule as current_rule, rule_id as current_rule_id, rule_type as current_rule_type, version as current_version, auto_update as current_update, status as current_status
+| eval changed = "false"
 
-``` To remove ```
-| eval auto_update = 1, status = 1</query>
+``` Check whether the rule changed ```
+| eval changed = if(isnull(current_rule) OR current_rule != new_rule, "true", changed)
+
+``` Set the current/new values ```
+| eval version = if(changed="true", new_version, current_version)
+| eval rule = if(changed="true", new_rule, current_rule)
+| eval status  = coalesce(current_status, 1), auto_update = coalesce(current_update, 1), rule_id = coalesce(current_rule_id, rule_id), rule_type = coalesce(current_rule_type, rule_type)
+
+| table key, rule_type, rule_id, rule, version, status, auto_update, changed</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -71,20 +126,23 @@
       </table>
     </panel>
   </row>
-  <row>
+  <row depends="$show_show_panels$">
     <panel id="show_count_rules_panel">
       <chart>
         <title>Active rules by malicious behavior</title>
         <search base="base_show_rules_search">
-          <query>| search status="1" rule_type IN ("XSS", "LFI", "RCE", "SQLI")
-| stats count by rule_type</query>
+          <query>| search rule_type IN ("XSS", "LFI", "RCE", "SQLI")
+| eval active = if(status="1", 1, 0)
+| stats sum(active) as nb_active, sum(eval(1 - active)) as nb_inactive by rule_type</query>
         </search>
         <option name="charting.axisTitleX.visibility">collapsed</option>
         <option name="charting.axisTitleY.visibility">collapsed</option>
         <option name="charting.chart">bar</option>
-        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.drilldown">none</option>
-        <option name="charting.fieldColors">{"count": #55C169}</option>
+        <option name="charting.fieldColors">{"nb_active": #55C169, "nb_inactive": #D41F1F}</option>
+        <option name="charting.layout.splitSeries">0</option>
         <option name="charting.legend.placement">none</option>
         <option name="refresh.display">progressbar</option>
       </chart>
