@@ -4,3 +4,9 @@
 []
 access = read : [ * ], write : [ admin, sc_admin ]
 export = system
+
+[views/http_injections_manage_rules]
+export = none
+
+[views/http_injections_readme]
+export = none
