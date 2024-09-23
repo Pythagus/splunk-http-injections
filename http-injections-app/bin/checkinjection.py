@@ -47,12 +47,6 @@ class CheckInjectionCommand(StreamingCommand):
             **Description:** Determine whether all rules must be checked, or if we stop the checks when a rule matches''',
         require=False, default=False, validate=validators.Boolean())
 
-    hostname = Option(
-        doc='''
-            **Syntax:** **hostname=***<str>*
-            **Description:** Field containing the web server hostname like example.com''',
-        require=False, validate=validators.Fieldname())
-
     url = Option(
         doc='''
             **Syntax:** **url=***<str>*
