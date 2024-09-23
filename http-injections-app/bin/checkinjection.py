@@ -111,11 +111,8 @@ class CheckInjectionCommand(StreamingCommand):
         try:
             http_rules = get_rules_from_kvstore(self.service)
         except Exception as e:
-            self.write_error(repr(e))
-            exit(1)
-        #except:
-        #    self.write_error("HttpInjections: Failed to load rules from KV-Store (%s)" % KVSTORE_NAME, e)
-        #    exit(ERR_KVSTORE_RULES_RETRIEVAL)
+            self.write_error("HttpInjections: Failed to load rules from KV-Store (%s)" % KVSTORE_NAME, e)
+            exit(ERR_KVSTORE_RULES_RETRIEVAL)
 
         # Build the regexes and local stuff.
         try:
